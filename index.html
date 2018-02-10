@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript" src="jquery.min.js"></script>
+
+        <script type="text/javascript">
+            google.charts.load('current', {'packages': ['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+            var charts = [];
+            var options;
+            var i = 0;
+            function drawChart() {
+                i = i + 10;
+                var jsonData = $.ajax({
+                    url: "getData.php?getdata",
+                    dataType: "json",
+                    async: false
+                }).responseText;
+
+                var jsonArr = JSON.parse(jsonData);
+                var keys = Object.keys(jsonArr[0]);
+                console.log(keys);
+                for (var index = 0; index < jsonArr.length; index++) {
+                    var chartObjetName = Object.keys(jsonArr[index]);
+                    console.log(jsonArr[index] + " ----");
+                    console.log(jsonArr[index][chartObjetName]);
+                    if (charts[chartObjetName] == null) {
+
+                        charts[chartObjetName] = [];
+                        charts[chartObjetName]["chart"] = "";
+                        charts[chartObjetName]["options"] = "";
+                        console.log(charts + " 0000");
+                        charts[chartObjetName]['options'] = {
+                            title: "-" + chartObjetName,
+                            is3D: true,
+                            slices: {
+                                0: {color: '#B3082D'},
+                                1: {color: '#017580'}
+                            },
+                            fontSize: '25pt',
+                            legend: {position: 'rigth', textStyle: {color: 'blue', fontSize: 23}}
+
+
+
+                        };
+                        console.log("TestData : " + jsonArr[index][chartObjetName].rows[0].c[1].v);
+                        if (jsonArr[index][chartObjetName].rows[0].c[1].v != 0 || jsonArr[index][chartObjetName].rows[1].c[1].v != 0) {
+
+                            if (!$("#pie" + chartObjetName).length) {
+                                if (index % 2 == 0) {
+                                    var trID = index;
+                                    $("#tblCharts").append('<tr id="tr' + trID + '"></tr>')
+                                }
+                                $("#tblCharts").find("#tr" + trID).append('<td><div id="pie' + chartObjetName + '" style="width: 750px; height: 400px;"></div></td>');
+                            }
+                            var data = new google.visualization.DataTable(jsonArr[index][chartObjetName]);
+                            charts[chartObjetName]['chart'] = new google.visualization.PieChart(document.getElementById('pie' + chartObjetName));
+                            charts[chartObjetName]['chart'].draw(data, charts[chartObjetName]['options']);
+                        }
+                    } else {
+                        console.log(chartObjetName + " VARRR");
+                        if (jsonArr[index][chartObjetName].rows[0].c[1].v != 0 || jsonArr[index][chartObjetName].rows[1].c[1].v != 0) {
+                            var data = new google.visualization.DataTable(jsonArr[index][chartObjetName]);
+                            charts[chartObjetName]['chart'].draw(data, charts[chartObjetName]['options']);
+                        }
+                    }
+                }
+                /*   
+                 if (i == 1000) {
+                 clearInterval(timer);
+                 }
+                 */
+            }
+
+
+
+            timer = setInterval(drawChart, 1000);
+
+
+        </script>
+    </head>
+    <body>
+        <table id="tblCharts">
+
+        </table>
+
+    </body>
+</html>

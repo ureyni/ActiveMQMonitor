@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+        <script type="text/javascript">
+            google.charts.load('current', {'packages': ['corechart']});
+           google.charts.setOnLoadCallback(drawChart);
+            var chart;
+            var options;
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Task', 'Kuyruk Durumu'],
+                    ['Bekleyen', 1000],
+                    ['İşlenen', 0]
+                ]);
+
+                options = {
+                    title: 'Kuyruk Adı',
+                    is3D: true,
+                    slices: {
+                        0: {color: 'red'},
+                        1: {color: 'green'}
+                    }
+
+                };
+
+                chart = new google.visualization.PieChart(document.getElementById('piechart1'));
+
+                chart.draw(data, options);
+
+                chart2 = new google.visualization.PieChart(document.getElementById('piechart2'));
+
+                chart2.draw(data, options);
+            }
+
+            var i = 0;
+            var timer;
+            var chart_update = function () {
+                console.log(i);
+                i = i + 10;
+                var jsonData = $.ajax({
+                    url: "getData.php?counter=" + i,
+                    dataType: "json",
+                    async: false
+                }).responseText;
+
+                var jsonData = $.ajax({
+                    url: "getData.php?getdata" + i,
+                    dataType: "json",
+                    async: false
+                }).responseText;
+
+                var data = new google.visualization.DataTable(jsonData);
+                chart.draw(data, options);
+                if (i == 1000) {
+                    clearInterval(timer);
+                }
+            }
+
+            timer = setInterval(chart_update, 1000);
+
+        </script>
+    </head>
+    <body>
+        <table id="tblGCharts">
+            <tr><td>
+                    <div id="piechart1" style="width: 600px; height: 500px;"></div>
+                </td><td>
+                    <div id="piechart2" style="width: 600px; height: 500px;"></div>
+                </td> 
+            </tr>
+        </table>
+    </body>
+</html>
